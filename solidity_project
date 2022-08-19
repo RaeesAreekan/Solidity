@@ -1,0 +1,61 @@
+//SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+contract CrowdFunding{
+    uint public raisedAmount;
+    address public owner;
+    uint public deadline;
+    uint public target;
+    uint public noOfContributors;
+
+    mapping (uint=>address) public contributors;
+    mapping (address=>uint) public amcontributors;
+
+    constructor(uint _target) payable{
+        owner=msg.sender;
+        deadline=block.timestamp + 3600*24*2;
+        target=_target;
+
+
+
+
+    }
+    function sendeth() payable public{
+        require(block.timestamp<deadline,"you have passed deadline");
+
+contributors[noOfContributors]=msg.sender;
+amcontributors[msg.sender]=msg.value;
+raisedAmount+=(msg.value)/10**18;
+noOfContributors++;
+
+
+         
+
+    }
+    modifier admin{
+      require(msg.sender==owner,"only owner can tranfer funds");  
+      _;
+    }
+    function transfund(uint val) payable public admin{
+        require(val<=raisedAmount,"not enough funds");
+        address payable user=payable(owner);
+        user.transfer(val);
+        raisedAmount-=val;
+
+        
+        
+
+
+        
+    }
+    function refund() public payable{
+        require(block.timestamp>deadline,"wait for 2 days");
+        for(uint index=0;index<noOfContributors;index++)
+        {
+            address payable user=payable(contributors[index]);
+            user.transfer(amcontributors[user]);
+
+
+        }
+    }
+
+}
