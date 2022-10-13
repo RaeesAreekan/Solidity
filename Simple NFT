@@ -1,0 +1,41 @@
+//SPDX-License-Identifier:Unlicense
+pragma solidity ^0.8.7;
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+contract NFT is ERC721 , Ownable {
+    uint256 public MintPrice= 0.05 ether;
+    uint256 public totalsupply;
+    uint256 public maxsupply;
+    bool public isMintEnabled;
+    mapping(address=>uint256) public mintedwallets;
+    
+    constructor() payable ERC721('Simplemint','SMP'){
+        maxsupply=2;
+    }
+    function mintenabled() external onlyOwner{
+        isMintEnabled=!isMintEnabled;
+    }
+    function setmax(uint256 supply_) external onlyOwner {
+        maxsupply=supply_;
+
+    }
+    function mint() payable external{
+        require(isMintEnabled,'pls enable minting option');
+        require(mintedwallets[msg.sender]<1,'U can only mint one time with an account');
+        require(msg.value==MintPrice,'pls provide required ether');
+        require(maxsupply>totalsupply,'empty');
+        mintedwallets[msg.sender]++;
+        totalsupply++;
+        uint256 tokenid=totalsupply;
+        _safeMint(msg.sender, tokenid);
+
+    }
+
+
+
+
+
+
+}
+
+
